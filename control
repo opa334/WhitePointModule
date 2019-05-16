@@ -1,0 +1,12 @@
+Package: com.opa334.whitepointmodule
+Name: White Point Module
+Depends: mobilesubstrate, com.opa334.ccsupport, firmware (>= 11.0)
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Reduce White Point from Control Center!
+Depiction: https://opa334.github.io/depic/WhitePointModule/index.html
+SileoDepiction: https://opa334.github.io/depic/WhitePointModule/sileo.json
+Icon: https://opa334.github.io/depic/WhitePointModule/Resources/icon.png
+Maintainer: opa334
+Author: opa334
+Section: Control Center (Modules)
