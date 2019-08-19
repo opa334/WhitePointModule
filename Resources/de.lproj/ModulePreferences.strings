@@ -1,0 +1,2 @@
+"INVERT_SLIDER" = "Schieberegler invertieren";
+"INVERT_SLIDER_DESCRIPTION" = "Standardmäßig erhöht sich die Intensität der Weißpunktreduzierung zusammen mit dem Schieberegler. Diese Option invertiert dies und macht dass der Schieberegler sich ähnlich wie das Helligkeitsmodul verhält.";

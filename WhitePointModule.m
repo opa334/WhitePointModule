@@ -4,6 +4,12 @@
 #import "AccessibilityUtilities.h"
 
 #import <ControlCenterUIKit/CCUIModuleSliderView.h>
+#import <ControlCenterUI/CCUIModuleInstance.h>
+#import <ControlCenterUI/CCUIModuleInstanceManager.h>
+
+@interface CCUIModuleInstanceManager (CCSupport)
+- (CCUIModuleInstance*)instanceForModuleIdentifier:(NSString*)moduleIdentifier;
+@end
 
 #define kWhitePointIntensityMin 0.25
 #define kWhitePointIntensityMax 1.0
@@ -21,7 +27,10 @@ CGFloat moduleValueForWhitePointIntensityValue(CGFloat whitePointIntensityValue)
 	return (whitePointIntensityValue - kWhitePointIntensityMin) / (kWhitePointIntensityMax - kWhitePointIntensityMin);
 }
 
-static WhitePointModule* globalWhitePointModule;
+CGFloat reversedModuleValueForValue(CGFloat moduleValue)
+{
+	return -moduleValue + 1.0;
+}
 
 @implementation WhitePointModule
 
@@ -35,10 +44,11 @@ static WhitePointModule* globalWhitePointModule;
 	_backgroundViewController = [[WhitePointModuleBackgroundViewController alloc] init];
 	_backgroundViewController.module = self;
 
-	globalWhitePointModule = self;
 	_ignoreUpdates = NO;
 
-	[self updateState];
+	_preferences = [[NSUserDefaults alloc] initWithSuiteName:@"com.opa334.whitepointmodule"];
+
+	[self updatePrefs];
 
 	return self;
 }
@@ -53,6 +63,12 @@ static WhitePointModule* globalWhitePointModule;
 	return _backgroundViewController;
 }
 
+- (void)updatePrefs
+{
+	_invertPercententageEnabled = [_preferences boolForKey:@"invertSliderEnabled"];
+	[self updateState];
+}
+
 - (void)updateState
 {
 	if(!_ignoreUpdates)
@@ -60,8 +76,14 @@ static WhitePointModule* globalWhitePointModule;
 		BOOL currentState = [AXSettings sharedInstance].reduceWhitePointEnabled;
 		[_contentViewController setSelected:currentState];
 
-		CGFloat currentIntensity = MADisplayFilterPrefGetReduceWhitePointIntensity();
-		_contentViewController.sliderView.value = moduleValueForWhitePointIntensityValue(currentIntensity);
+		CGFloat moduleValue = moduleValueForWhitePointIntensityValue(MADisplayFilterPrefGetReduceWhitePointIntensity());
+
+		if(_invertPercententageEnabled)
+		{
+			moduleValue = reversedModuleValueForValue(moduleValue);
+		}
+
+		_contentViewController.sliderView.value = moduleValue;
 	}
 }
 
@@ -72,7 +94,14 @@ static WhitePointModule* globalWhitePointModule;
 	BOOL newState = [_contentViewController isSelected];
 	[AXSettings sharedInstance].reduceWhitePointEnabled = newState;
 
-	CGFloat newIntensity = whitePointIntensityValueForModuleValue(_contentViewController.sliderView.value);
+	CGFloat moduleValue = _contentViewController.sliderView.value;
+
+	if(_invertPercententageEnabled)
+	{
+		moduleValue = reversedModuleValueForValue(moduleValue);
+	}
+
+	CGFloat newIntensity = whitePointIntensityValueForModuleValue(moduleValue);
 	MADisplayFilterPrefSetReduceWhitePointIntensity(newIntensity);
 	//RE: How did you find this function?
 	//I reversed the PreferenceBundle of the accessibility settings and saw that it was calling it (probably... I don't know for sure)
@@ -82,12 +111,16 @@ static WhitePointModule* globalWhitePointModule;
 
 @end
 
+void prefsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+{
+	CCUIModuleInstance* wpModuleInstance = [[NSClassFromString(@"CCUIModuleInstanceManager") sharedInstance] instanceForModuleIdentifier:@"com.opa334.whitepointmodule"];
+	[(WhitePointModule*)wpModuleInstance.module updatePrefs];
+}
+
 void displayFilterSettingsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
-	if(globalWhitePointModule)
-	{
-		[globalWhitePointModule updateState];
-	}
+	CCUIModuleInstance* wpModuleInstance = [[NSClassFromString(@"CCUIModuleInstanceManager") sharedInstance] instanceForModuleIdentifier:@"com.opa334.whitepointmodule"];
+	[(WhitePointModule*)wpModuleInstance.module updateState];
 }
 
 __attribute__((constructor))
@@ -96,4 +129,6 @@ static void init(void)
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, displayFilterSettingsChanged, CFSTR("com.apple.mediaaccessibility.displayFilterSettingsChanged"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 	//RE: How did you figure this key out?
 	//I hooked CFNotificationCenterPostNotification in Preferences.app with a log and toggled the option inside settings, this should work for any other option too
+
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, prefsChanged, CFSTR("com.opa334.whitepointmodule/ReloadPrefs"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 }

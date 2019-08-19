@@ -8,7 +8,9 @@ extern CGFloat moduleValueForWhitePointIntensityValue(CGFloat whitePointIntensit
 
 @interface WhitePointModule : NSObject <CCUIContentModule>
 {
+	NSUserDefaults* _preferences;
 	BOOL _ignoreUpdates;
+	BOOL _invertPercententageEnabled;
 	WhitePointModuleBackgroundViewController* _backgroundViewController;
 	WhitePointModuleContentViewController* _contentViewController;
 }

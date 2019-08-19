@@ -1,0 +1,2 @@
+"INVERT_SLIDER" = "Invert Slider";
+"INVERT_SLIDER_DESCRIPTION" = "By default the intensity of the white point filter will increase together with the slider, this option will invert the slider so it behaves more like the brightness module.";

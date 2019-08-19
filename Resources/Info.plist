@@ -50,5 +50,7 @@
 			<integer>1</integer>
 		</dict>
 	</dict>
+	<key>CCSPreferencesRootListController</key>
+	<string>WhitePointModuleRootListController</string>
 </dict>
 </plist>
