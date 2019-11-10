@@ -51,7 +51,6 @@
 	else //iOS 12 and below
 	{
 		self.sliderView = [[CCUIModuleSliderView alloc] initWithFrame:self.view.bounds];
-		self.sliderView.numberOfSteps = 0;
 	}
 
 	self.sliderView.glyphVisible = YES;
