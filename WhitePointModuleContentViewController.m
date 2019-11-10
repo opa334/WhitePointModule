@@ -14,6 +14,9 @@
 @property (assign,nonatomic) CGFloat continuousSliderCornerRadius;
 @end
 
+@interface CCUIContinuousSliderView : CCUIModuleSliderView //not actually a subclass of CCUIModuleSliderView, this is just to make it compile
+@end
+
 @implementation WhitePointModuleContentViewController
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -41,7 +44,16 @@
 {
 	[super viewDidLoad];
 
-	self.sliderView = [[CCUIModuleSliderView alloc] initWithFrame:self.view.bounds];
+	if(NSClassFromString(@"CCUIContinuousSliderView")) //iOS 13
+	{
+		self.sliderView = [[NSClassFromString(@"CCUIContinuousSliderView") alloc] initWithFrame:self.view.bounds];
+	}
+	else //iOS 12 and below
+	{
+		self.sliderView = [[CCUIModuleSliderView alloc] initWithFrame:self.view.bounds];
+		self.sliderView.numberOfSteps = 0;
+	}
+
 	self.sliderView.glyphVisible = YES;
 	[self.sliderView addTarget:self action:@selector(_sliderValueDidChange:) forControlEvents:UIControlEventValueChanged];
 	[self.module updateState];
