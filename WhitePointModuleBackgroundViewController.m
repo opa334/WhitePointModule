@@ -18,4 +18,9 @@
 	return self;
 }
 
+- (BOOL)_canShowWhileLocked
+{
+	return YES;
+}
+
 @end

@@ -126,4 +126,9 @@
 	return self.sliderView.punchOutRootLayer;
 }
 
+- (BOOL)_canShowWhileLocked
+{
+	return YES;
+}
+
 @end
