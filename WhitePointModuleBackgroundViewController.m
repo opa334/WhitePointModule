@@ -1,3 +1,6 @@
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 #import "WhitePointModuleBackgroundViewController.h"
 
 #import "WhitePointModule.h"

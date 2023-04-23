@@ -1,3 +1,6 @@
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 #import "WhitePointModuleContentViewController.h"
 
 #import "WhitePointModule.h"
