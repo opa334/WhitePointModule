@@ -53,7 +53,7 @@
 	}
 	else //iOS 12 and below
 	{
-		self.sliderView = [[CCUIModuleSliderView alloc] initWithFrame:self.view.bounds];
+		self.sliderView = [[NSClassFromString(@"CCUIModuleSliderView") alloc] initWithFrame:self.view.bounds];
 	}
 
 	self.sliderView.glyphVisible = YES;
